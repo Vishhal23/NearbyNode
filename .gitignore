@@ -1,0 +1,38 @@
+# ============================================================
+#  .gitignore — TrustMart
+# ============================================================
+
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.*.local
+server/.env
+
+# Build output
+dist/
+build/
+
+# Vite
+.vite/
+*.local
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+logs/
