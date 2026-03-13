@@ -2,7 +2,7 @@ import api from './api';
 
 const authService = {
     register: async (name, email, password, role = 'buyer') => {
-        const { data } = await api.post('/auth/register', { name, email, password, role });
+        const { data } = await api.post('auth/register', { name, email, password, role });
         if (data.success) {
             localStorage.setItem('nn_token', data.data.token);
             localStorage.setItem('nn_user', JSON.stringify(data.data));
@@ -11,7 +11,7 @@ const authService = {
     },
 
     login: async (email, password) => {
-        const { data } = await api.post('/auth/login', { email, password });
+        const { data } = await api.post('auth/login', { email, password });
         if (data.success) {
             localStorage.setItem('nn_token', data.data.token);
             localStorage.setItem('nn_user', JSON.stringify(data.data));
@@ -20,7 +20,7 @@ const authService = {
     },
 
     getMe: async () => {
-        const { data } = await api.get('/auth/me');
+        const { data } = await api.get('auth/me');
         return data;
     },
 

@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
                     console.log(`[Auth] 🔄 Syncing with backend... (Role: ${pendingRole || 'existing'})`);
 
-                    const res = await api.post('/auth/firebase', {
+                    const res = await api.post('auth/firebase', {
                         idToken,
                         firebaseUid: currentUser.uid,
                         email: currentUser.email,
@@ -228,7 +228,7 @@ export const AuthProvider = ({ children }) => {
                     // We are linking phone to an explicitly logged-in user
                     try {
                         // Immediately sync the mock phone directly to the DB so it persists
-                        api.post('/auth/firebase', {
+                        api.post('auth/firebase', {
                             idToken: await auth.currentUser.getIdToken(),
                             firebaseUid: auth.currentUser.uid,
                             phone: confirmationResult.phone

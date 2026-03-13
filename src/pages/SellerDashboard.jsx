@@ -28,11 +28,11 @@ const SellerDashboard = () => {
             try {
                 setLoading(true);
                 // Fetch seller orders
-                const ordersRes = await api.get('/orders/seller');
+                const ordersRes = await api.get('orders/seller');
                 const orders = ordersRes.data.data || [];
 
                 // Fetch seller products
-                const productsRes = await api.get('/products');
+                const productsRes = await api.get('products');
                 const allProducts = productsRes.data.data || [];
 
                 // Calculate stats

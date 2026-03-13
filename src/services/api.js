@@ -1,12 +1,20 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace(/\/?$/, '/');
 
 const api = axios.create({
     baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
     },
+});
+
+// Add a request interceptor for logging in development/production
+api.interceptors.request.use((config) => {
+    console.log(`[API] 🚀 ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    return config;
+}, (error) => {
+    return Promise.reject(error);
 });
 
 // Attach JWT token to every request

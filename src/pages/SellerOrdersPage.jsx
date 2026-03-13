@@ -24,7 +24,7 @@ const SellerOrdersPage = () => {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const { data } = await api.get('/orders/seller');
+            const { data } = await api.get('orders/seller');
             setOrders(data.data || []);
         } catch (err) {
             console.error('Failed to load seller orders:', err);
@@ -36,7 +36,7 @@ const SellerOrdersPage = () => {
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
             setUpdatingId(orderId);
-            await api.put(`/orders/${orderId}/status`, {
+            await api.put(`orders/${orderId}/status`, {
                 status: newStatus,
                 note: `Status updated to ${newStatus} by seller`
             });
