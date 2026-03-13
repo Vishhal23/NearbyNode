@@ -3,17 +3,25 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-    const { user, dbUser, loading: authLoading, loginWithGoogle, sendOtp, verifyOtp, loginWithEmail } = useAuth();
+    const { user, dbUser, loading: authLoading, syncing: authSyncing, loginWithGoogle, sendOtp, verifyOtp, loginWithEmail } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // If already logged in, redirect immediately (wait for sync if loading)
+    // If already logged in, redirect immediately (WAIT for sync and loading)
     useEffect(() => {
-        if (!authLoading && user && dbUser) {
-            const from = location.state?.from?.pathname || (dbUser.role === 'seller' ? '/seller/dashboard' : '/buyer/home');
-            navigate(from, { replace: true });
+        // Only redirect if auth is fully loaded AND synced (or failed but we decided to proceed)
+        if (!authLoading && !authSyncing) {
+            if (user && dbUser) {
+                console.log('[Login] 🏁 Auth ready, redirecting to role:', dbUser.role);
+                const from = location.state?.from?.pathname || (dbUser.role === 'seller' ? '/seller/dashboard' : '/buyer/home');
+                navigate(from, { replace: true });
+            } else if (user && !dbUser) {
+                // This happens if sync failed
+                console.error('[Login] ❌ Firebase user exists but Backend record missing.');
+                setError('Authentication with our backend failed. Please try again or check your connection.');
+            }
         }
-    }, [user, dbUser, authLoading, navigate, location]);
+    }, [user, dbUser, authLoading, authSyncing, navigate, location]);
 
     // ── State ────────────────────────────────────────────────────
     const [tab, setTab] = useState('email'); // 'email' | 'phone'
@@ -192,6 +200,16 @@ const LoginPage = () => {
                         <div className="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-100 flex items-start gap-3">
                             <span className="text-green-500 mt-0.5">✅</span>
                             <p className="text-green-600 text-sm">{success}</p>
+                        </div>
+                    )}
+
+                    {authSyncing && (
+                        <div className="mb-4 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
+                            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mt-1" />
+                            <div>
+                                <p className="text-blue-700 text-sm font-semibold">Synchronizing account...</p>
+                                <p className="text-blue-600 text-xs">Our backend server is waking up (Render.com). This might take 30-50 seconds if it was asleep.</p>
+                            </div>
                         </div>
                     )}
 

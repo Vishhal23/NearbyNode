@@ -17,25 +17,22 @@ import { useAuth } from '../context/AuthContext';
  *   <ProtectedRoute allowedRoles={['seller','admin']}>— sellers & admins
  */
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    const { user, loading } = useAuth();
+    const { user, dbUser, loading, syncing } = useAuth();
     const location = useLocation();
 
-    // Read role from the local storage backend user data
-    const storedUser = (() => {
-        try {
-            const raw = localStorage.getItem('nn_user');
-            return raw ? JSON.parse(raw) : null;
-        } catch {
-            return null;
-        }
-    })();
-
-    if (loading) {
+    if (loading || syncing) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="flex flex-col items-center gap-4">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+                <div className="flex flex-col items-center gap-4 text-center">
                     <div className="w-12 h-12 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
-                    <p className="text-gray-500 text-sm font-medium">Loading...</p>
+                    <div>
+                        <p className="text-gray-900 font-semibold">Securely signing you in...</p>
+                        {syncing && (
+                            <p className="text-gray-500 text-sm mt-1 max-w-xs">
+                                Syncing with our backend. Please wait while we verify your dashboard access.
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
         );
@@ -48,7 +45,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     // Role-based access control
     if (allowedRoles && allowedRoles.length > 0) {
-        const userRole = storedUser?.role || 'buyer';
+        const userRole = dbUser?.role || 'buyer';
         if (!allowedRoles.includes(userRole)) {
             // Redirect to appropriate home based on their actual role
             const roleRedirects = {

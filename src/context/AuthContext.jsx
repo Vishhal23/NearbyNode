@@ -23,12 +23,9 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [dbUser, setDbUser] = useState(() => {
-        const stored = localStorage.getItem('nn_user');
-        return stored ? JSON.parse(stored) : null;
-    });
+    const [dbUser, setDbUser] = useState(null); // Start null to avoid stale role redirects
     const [loading, setLoading] = useState(true);
-    // Extended profile fields (bio, location) stored in Firestore
+    const [syncing, setSyncing] = useState(false); // New state to track backend sync specifically
     const [userProfile, setUserProfile] = useState(null);
 
     // Listen to Firebase auth state changes + load Firestore profile
@@ -61,9 +58,12 @@ export const AuthProvider = ({ children }) => {
 
                 // Sync with custom backend to get JWT and DB User Role
                 try {
+                    setSyncing(true);
                     const idToken = await currentUser.getIdToken();
                     const pendingRole = sessionStorage.getItem('pending_role');
                     const pendingName = sessionStorage.getItem('pending_name') || currentUser.displayName;
+
+                    console.log(`[Auth] 🔄 Syncing with backend... (Role: ${pendingRole || 'existing'})`);
 
                     const res = await api.post('/auth/firebase', {
                         idToken,
@@ -76,20 +76,26 @@ export const AuthProvider = ({ children }) => {
                     });
 
                     if (res.data.success) {
+                        console.log('[Auth] ✅ Backend sync successful');
                         localStorage.setItem('nn_token', res.data.data.token);
                         localStorage.setItem('nn_user', JSON.stringify(res.data.data));
                         setDbUser(res.data.data);
 
-                        // Clear pending states after successful sync
                         sessionStorage.removeItem('pending_role');
                         sessionStorage.removeItem('pending_name');
                         sessionStorage.removeItem('mock_phone');
                     }
                 } catch (error) {
                     console.error('[Auth Sync Error]', error.response?.data || error.message);
-                    // If sync fails, we shouldn't pretend the user is fully logged in to our system
+                    // Check if it's a CORS or connection error (common in deployment)
+                    if (error.code === 'ERR_NETWORK') {
+                        console.warn('[Auth] 🚨 Backend is unreachable. Check CORS or Render wake-up status.');
+                    }
+                    // If sync fails, we might still have a Firebase user but no DB record/role. 
+                    // LoginPage should see dbUser is null and show error.
                 } finally {
-                    setLoading(false); // Sync finished (success or fail)
+                    setSyncing(false);
+                    setLoading(false);
                 }
 
             } else {
@@ -98,7 +104,8 @@ export const AuthProvider = ({ children }) => {
                 localStorage.removeItem('nn_token');
                 localStorage.removeItem('nn_user');
                 if (unsubProfile) unsubProfile();
-                setLoading(false); // No user, done loading
+                setLoading(false);
+                setSyncing(false);
             }
         });
 
@@ -299,6 +306,7 @@ export const AuthProvider = ({ children }) => {
         dbUser,
         userProfile,
         loading,
+        syncing,
         loginWithGoogle,
         registerWithEmail,
         loginWithEmail,
