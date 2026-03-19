@@ -13,7 +13,8 @@ const LoginPage = () => {
         if (!authLoading && !authSyncing) {
             if (user && dbUser) {
                 console.log('[Login] 🏁 Auth ready, redirecting to role:', dbUser.role);
-                const from = location.state?.from?.pathname || (dbUser.role === 'seller' ? '/seller/dashboard' : '/buyer/home');
+                const from = location.state?.from?.pathname || 
+                    (dbUser.role === 'admin' ? '/admin/dashboard' : dbUser.role === 'seller' ? '/seller/dashboard' : '/buyer/home');
                 navigate(from, { replace: true });
             } else if (user && !dbUser) {
                 // This happens if sync failed
@@ -217,21 +218,40 @@ const LoginPage = () => {
                     <div className="mb-5">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Login as...</label>
                         <div className="flex p-1 bg-gray-100 rounded-xl">
-                            {['buyer', 'seller'].map((r) => (
+                            {['buyer', 'seller', 'admin'].map((r) => (
                                 <button
                                     key={r}
                                     type="button"
                                     onClick={() => setRole(r)}
                                     className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 capitalize ${role === r
-                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        ? r === 'admin' ? 'bg-white text-red-600 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
                                         : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
-                                    {r === 'buyer' ? '🛍️ Buyer' : '🏪 Seller'}
+                                    {r === 'buyer' ? '🛍️ Buyer' : r === 'seller' ? '🏪 Seller' : '🛡️ Admin'}
                                 </button>
                             ))}
                         </div>
                         <p className="text-xs text-gray-400 mt-1 text-center">Select your role to ensure you land in the right dashboard.</p>
+                    </div>
+
+                    {/* Quick Login Buttons */}
+                    <div className="mb-5 p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-100">
+                        <p className="text-xs font-semibold text-gray-500 mb-2 text-center">⚡ Quick Login (Demo)</p>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setTab('email');
+                                    setEmail('vishalgudla2@gmail.com');
+                                    setPassword('Vishal@123');
+                                    setRole('admin');
+                                }}
+                                className="flex-1 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                                🛡️ Admin
+                            </button>
+                        </div>
                     </div>
 
                     <button

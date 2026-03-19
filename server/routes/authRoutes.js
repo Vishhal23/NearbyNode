@@ -113,7 +113,7 @@ router.post('/firebase', async (req, res) => {
                 name: name || 'Anonymous User',
                 email: email || `${firebaseUid}@firebase.local`, // Fallback for phone auth
                 password: firebaseUid + process.env.JWT_SECRET, // Dummy strict password
-                role: (role && ['buyer', 'seller'].includes(role)) ? role : 'buyer',
+                role: (role && ['buyer', 'seller', 'admin'].includes(role)) ? role : 'buyer',
                 firebaseUid,
                 avatar: photoURL || '',
                 phone: phone || ''
@@ -128,7 +128,7 @@ router.post('/firebase', async (req, res) => {
             }
 
             // If the frontend explicitly sent a valid role (e.g. from the Registration page), overwrite it
-            if (role && ['buyer', 'seller'].includes(role) && user.role !== role) {
+            if (role && ['buyer', 'seller', 'admin'].includes(role) && user.role !== role) {
                 user.role = role;
                 needsSave = true;
             }
