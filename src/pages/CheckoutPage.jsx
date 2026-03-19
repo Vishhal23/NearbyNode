@@ -87,7 +87,7 @@ const CheckoutPage = () => {
                 setOrderPlaced(true);
                 clearCart();
                 // Route to unified success page
-                navigate(`/checkout/success?order_id=${response.data._id}&method=mock`);
+                navigate(`/checkout/success?order_id=${response.data._id}&method=${paymentMethod}`);
             }
         } catch (error) {
             console.error('Checkout failed:', error);
@@ -185,6 +185,18 @@ const CheckoutPage = () => {
                                                 <div className="flex-1">
                                                     <p className="font-semibold text-sm text-gray-800">Mock Payment (Demo)</p>
                                                     <p className="text-xs text-gray-500">Auto-confirmed without real money</p>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        {/* COD */}
+                                        <label className={`block rounded-xl p-4 border cursor-pointer transition-all ${paymentMethod === 'cod' ? 'bg-blue-50 border-blue-500 shadow-sm' : 'border-gray-200 hover:border-blue-200'}`}>
+                                            <div className="flex items-center gap-3 w-full">
+                                                <input type="radio" name="paymentMethod" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-4 h-4 text-blue-600 focus:ring-blue-500" />
+                                                <div className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-lg flex items-center justify-center text-xl">🚚</div>
+                                                <div className="flex-1">
+                                                    <p className="font-semibold text-sm text-gray-800">Cash on Delivery</p>
+                                                    <p className="text-xs text-gray-500">Pay when you receive the item</p>
                                                 </div>
                                             </div>
                                         </label>

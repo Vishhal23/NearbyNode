@@ -71,7 +71,23 @@ const userSchema = new mongoose.Schema({
         default: 'new',
     },
 
-    // Moderation
+    // Aadhaar Document Verification
+    aadhaarSubmitted: { type: Boolean, default: false },
+    aadhaarFront: { type: String, default: '' },
+    aadhaarBack: { type: String, default: '' },
+    aadhaarStatus: {
+        type: String,
+        enum: ['not_submitted', 'pending', 'approved', 'rejected'],
+        default: 'not_submitted',
+    },
+    aadhaarRejectionReason: { type: String, default: '' },
+
+    // Fraud & Moderation
+    fraudFlag: { type: Boolean, default: false },
+    fraudFlagDate: { type: Date },
+    fraudFlagReason: { type: String, default: '' },
+    isBanned: { type: Boolean, default: false },
+    bannedReason: { type: String, default: '' },
     flagCount: { type: Number, default: 0 },
     isSuspended: { type: Boolean, default: false },
     suspendedAt: { type: Date },

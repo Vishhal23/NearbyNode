@@ -75,8 +75,15 @@ router.post('/', protect, [
 
         // If 'stripe', create in unpaid state. Else, mock payment.
         const isStripe = paymentMethod === 'stripe';
-        const initialPaymentStatus = isStripe ? 'unpaid' : 'paid';
-        const initialStatus = isStripe ? 'pending' : 'confirmed';
+        const isCOD = paymentMethod === 'cod';
+        
+        // Initial payment status
+        let initialPaymentStatus = 'paid'; // Default for mock
+        if (isStripe || isCOD) initialPaymentStatus = 'unpaid';
+
+        // Initial order status
+        let initialStatus = 'confirmed'; // Default for mock/cod
+        if (isStripe) initialStatus = 'pending';
 
         const order = await Order.create({
             buyer: req.user._id,
@@ -90,11 +97,11 @@ router.post('/', protect, [
             status: initialStatus,
             statusHistory: [
                 { status: 'pending', note: 'Order placed' },
-                ...(!isStripe ? [{ status: 'confirmed', note: 'Payment confirmed (mock)' }] : [])
+                ...(!isStripe ? [{ status: initialStatus, note: isCOD ? 'Order confirmed (Cash on Delivery)' : 'Payment confirmed (mock)' }] : [])
             ],
         });
 
-        // If mock payment, immediately update product & seller stats
+        // If mock or COD payment, immediately update product & seller stats
         if (!isStripe) {
             for (const item of orderItems) {
                 await Product.findByIdAndUpdate(item.product, {

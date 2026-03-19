@@ -13,6 +13,7 @@ import OtpVerificationPage from './pages/OtpVerificationPage';
 import SellerDashboard from './pages/SellerDashboard';
 import AddProductPage from './pages/AddProductPage';
 import BuyerHomePage from './pages/BuyerHomePage';
+import PublicProfilePage from './pages/PublicProfilePage';
 import SellerProfilePage from './pages/SellerProfilePage';
 import AdminVerificationPanel from './pages/AdminVerificationPanel';
 import HyperVergeKYC from './pages/HyperVergeKYC';
@@ -24,6 +25,14 @@ import CheckoutSuccessPage from './pages/CheckoutSuccessPage';
 import MyListingsPage from './pages/MyListingsPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import SellerOrdersPage from './pages/SellerOrdersPage';
+
+// Admin Pages
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminProductApprovalPage from './pages/admin/AdminProductApprovalPage';
+import AdminKYCPage from './pages/admin/AdminKYCPage';
+import AdminFraudReportsPage from './pages/admin/AdminFraudReportsPage';
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 
 function App() {
     return (
@@ -37,6 +46,7 @@ function App() {
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/register" element={<RegisterPage />} />
                             <Route path="/verify-otp" element={<OtpVerificationPage />} />
+                            <Route path="/seller/profile/:id" element={<PublicProfilePage />} />
 
                             {/* Protected — Buyer */}
                             <Route
@@ -156,6 +166,55 @@ function App() {
                                 element={
                                     <ProtectedRoute allowedRoles={['admin']}>
                                         <AdminVerificationPanel />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                            <Route
+                                path="/admin/dashboard"
+                                element={
+                                    <ProtectedRoute allowedRoles={['admin']}>
+                                        <AdminDashboardPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/users"
+                                element={
+                                    <ProtectedRoute allowedRoles={['admin']}>
+                                        <AdminUsersPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/products"
+                                element={
+                                    <ProtectedRoute allowedRoles={['admin']}>
+                                        <AdminProductApprovalPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/kyc"
+                                element={
+                                    <ProtectedRoute allowedRoles={['admin']}>
+                                        <AdminKYCPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/fraud"
+                                element={
+                                    <ProtectedRoute allowedRoles={['admin']}>
+                                        <AdminFraudReportsPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/admin/analytics"
+                                element={
+                                    <ProtectedRoute allowedRoles={['admin']}>
+                                        <AdminAnalyticsPage />
                                     </ProtectedRoute>
                                 }
                             />

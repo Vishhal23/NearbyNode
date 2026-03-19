@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
 const Product = require('../models/Product');
+const Flag = require('../models/Flag');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
@@ -143,6 +144,83 @@ router.get('/', async (req, res) => {
             .limit(50);
 
         res.json({ success: true, data: sellers });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// @route   POST /api/users/report
+// @desc    Report a seller
+// @access  Private
+router.post('/report', protect, async (req, res) => {
+    try {
+        const { reportedUserId, reason, description } = req.body;
+        if (!reportedUserId || !reason) {
+            return res.status(400).json({ success: false, message: 'reportedUserId and reason are required' });
+        }
+
+        const flag = await Flag.create({
+            reporter: req.user._id,
+            seller: reportedUserId,
+            reason,
+            description: description || '',
+        });
+
+        // Increment flag count on reported user
+        await User.findByIdAndUpdate(reportedUserId, { $inc: { flagCount: 1 } });
+
+        res.status(201).json({ success: true, data: flag });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// @route   POST /api/users/kyc/submit
+// @desc    Submit Aadhaar documents for verification
+// @access  Private (seller)
+const multer = require('multer');
+const path = require('path');
+
+const kycStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '..', 'uploads'));
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'kyc-' + uniqueSuffix + path.extname(file.originalname));
+    },
+});
+const kycUpload = multer({ storage: kycStorage, limits: { fileSize: 5 * 1024 * 1024 } });
+
+router.post('/kyc/submit', protect, kycUpload.fields([
+    { name: 'frontImage', maxCount: 1 },
+    { name: 'backImage', maxCount: 1 },
+]), async (req, res) => {
+    try {
+        const { aadhaarNumber } = req.body;
+        if (!aadhaarNumber || !/^\d{12}$/.test(aadhaarNumber)) {
+            return res.status(400).json({ success: false, message: 'Valid 12-digit Aadhaar number is required' });
+        }
+
+        const host = req.get('host');
+        const protocol = req.protocol;
+
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        user.kyc.aadhaarNumber = aadhaarNumber;
+        user.aadhaarSubmitted = true;
+        user.aadhaarStatus = 'pending';
+
+        if (req.files?.frontImage?.[0]) {
+            user.aadhaarFront = `${protocol}://${host}/uploads/${req.files.frontImage[0].filename}`;
+        }
+        if (req.files?.backImage?.[0]) {
+            user.aadhaarBack = `${protocol}://${host}/uploads/${req.files.backImage[0].filename}`;
+        }
+
+        await user.save();
+        res.json({ success: true, data: user });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

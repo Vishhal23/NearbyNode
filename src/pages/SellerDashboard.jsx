@@ -3,6 +3,7 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import adminService from '../services/adminService';
 
 const statusBadge = (status) => {
     const map = {
@@ -22,6 +23,11 @@ const SellerDashboard = () => {
     const [recentOrders, setRecentOrders] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [aadhaarNumber, setAadhaarNumber] = useState('');
+    const [aadhaarFront, setAadhaarFront] = useState(null);
+    const [aadhaarBack, setAadhaarBack] = useState(null);
+    const [kycSubmitting, setKycSubmitting] = useState(false);
+    const [kycStatus, setKycStatus] = useState(user?.aadhaarStatus || 'not_submitted');
 
     useEffect(() => {
         const loadDashboard = async () => {
@@ -159,6 +165,98 @@ const SellerDashboard = () => {
                     <span className="text-3xl block mb-2 group-hover:scale-110 transition-transform">⚙️</span>
                     <p className="text-xs font-semibold text-gray-700">Settings</p>
                 </Link>
+            </div>
+
+            {/* Aadhaar KYC Section */}
+            <div className="card mb-6 p-6">
+                <h2 className="font-bold text-gray-900 mb-1">🪪 Aadhaar KYC Verification</h2>
+                <p className="text-sm text-gray-400 mb-4">Submit your Aadhaar documents for identity verification.</p>
+
+                {kycStatus === 'approved' ? (
+                    <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <span className="text-2xl">✅</span>
+                        <div>
+                            <p className="font-semibold text-green-700">KYC Approved</p>
+                            <p className="text-sm text-green-600">Your Aadhaar has been verified. You&apos;re a trusted seller!</p>
+                        </div>
+                    </div>
+                ) : kycStatus === 'pending' ? (
+                    <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                        <span className="text-2xl">⏳</span>
+                        <div>
+                            <p className="font-semibold text-amber-700">Verification Pending</p>
+                            <p className="text-sm text-amber-600">Your documents are under review. This usually takes 1-2 business days.</p>
+                        </div>
+                    </div>
+                ) : kycStatus === 'rejected' ? (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <span className="text-2xl">❌</span>
+                            <div>
+                                <p className="font-semibold text-red-700">KYC Rejected</p>
+                                <p className="text-sm text-red-600">Please resubmit with valid documents.</p>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
+
+                {(kycStatus === 'not_submitted' || kycStatus === 'rejected') && (
+                    <div className="space-y-4 mt-4">
+                        <div>
+                            <label className="text-sm font-semibold text-gray-700 block mb-1.5">Aadhaar Number</label>
+                            <input
+                                type="text"
+                                value={aadhaarNumber}
+                                onChange={(e) => setAadhaarNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                                placeholder="Enter 12-digit Aadhaar number"
+                                maxLength={12}
+                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-semibold text-gray-700 block mb-1.5">Front Image</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setAadhaarFront(e.target.files[0])}
+                                    className="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-700 block mb-1.5">Back Image</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setAadhaarBack(e.target.files[0])}
+                                    className="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
+                                />
+                            </div>
+                        </div>
+                        <button
+                            disabled={kycSubmitting || aadhaarNumber.length !== 12 || !aadhaarFront || !aadhaarBack}
+                            onClick={async () => {
+                                try {
+                                    setKycSubmitting(true);
+                                    const formData = new FormData();
+                                    formData.append('aadhaarNumber', aadhaarNumber);
+                                    formData.append('frontImage', aadhaarFront);
+                                    formData.append('backImage', aadhaarBack);
+                                    await adminService.submitSellerKyc(formData);
+                                    setKycStatus('pending');
+                                } catch (err) {
+                                    alert('Failed to submit KYC. Please try again.');
+                                    console.error(err);
+                                } finally {
+                                    setKycSubmitting(false);
+                                }
+                            }}
+                            className="px-6 py-2.5 bg-blue-600 text-white font-semibold text-sm rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        >
+                            {kycSubmitting ? 'Submitting...' : '📤 Submit for Verification'}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Recent Orders Table */}

@@ -28,9 +28,13 @@ const CheckoutSuccessPage = () => {
         if (hasAttempted.current) return;
         hasAttempted.current = true;
 
-        if (method === 'mock') {
+        if (method === 'mock' || method === 'cod') {
             setStatus('success');
-            setMessage('Your mock payment was successful and order is confirmed!');
+            if (method === 'cod') {
+                setMessage('Your order has been placed successfully! Please keep the cash ready for delivery.');
+            } else {
+                setMessage('Your mock payment was successful and order is confirmed!');
+            }
             return;
         }
 

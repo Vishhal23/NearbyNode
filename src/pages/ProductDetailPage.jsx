@@ -210,7 +210,7 @@ const ProductDetailPage = () => {
                                 </div>
                             </div>
                             <Link
-                                to="/seller/profile"
+                                to={`/seller/profile/${seller._id}`}
                                 className="btn-secondary text-sm px-4 py-2"
                             >
                                 View Profile

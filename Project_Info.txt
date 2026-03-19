@@ -1,0 +1,37 @@
+NearbyNode — Final Review Quick Info
+
+1. Project Name: NearbyNode
+2. Domain: Hyperlocal C2C Marketplace with Trust Integration.
+3. Problem Solved: Eliminating scams in local marketplaces through verified identity and a dynamic Trust Score.
+
+4. Technology Stack:
+   - Frontend: React JS, Vite, Tailwind CSS
+   - Backend: Node JS, Express JS
+   - Database: MongoDB Atlas
+   - Authentication: Firebase Admin SDK
+   - Payments: Stripe INR Integration
+   - KYC: Sandbox.co.in (Aadhaar OTP)
+
+5. Unique Selling Points (USPs):
+   - Dynamic Trust Score Engine (Weightage-based).
+   - Real-time Identity Verification (KYC Proxy).
+   - Role-specific Dashboards (Buyer vs Seller).
+   - Secure server-side Auth verification.
+
+6. Trust Score Breakdown:
+   - Ratings & Reviews: 40%
+   - Aadhaar KYC: 25%
+   - Phone Auth: 15%
+   - Google Social Proof: 10%
+   - Profile Metrics: 10%
+
+7. Flowchart Logic:
+   Use the Mermaid diagrams provided in the Technical_Project_Summary.md file for Napkin AI or manual drawing.
+   - Flow 1: Auth Sync (Firebase -> Backend -> MongoDB).
+   - Flow 2: KYC Cycle (Frontend -> Proxy -> Sandbox -> UIDAI API -> DB).
+   - Flow 3: Order Status (Pending -> Confirmed -> Shipped -> Delivered).
+
+8. Development Status:
+   - Frontend deployed on Netlify (https://nearbynode.netlify.app).
+   - Backend deployed on Render (https://nearbynode.onrender.com).
+   - Status: Fully Functional MVP.
