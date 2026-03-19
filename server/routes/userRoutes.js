@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
 const Product = require('../models/Product');
-const Flag = require('../models/Flag');
+const Flag = require('../models/Report');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();

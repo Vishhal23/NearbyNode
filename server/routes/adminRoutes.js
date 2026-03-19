@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
-const Flag = require('../models/Flag');
+const Flag = require('../models/Report');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const { protect, authorize } = require('../middleware/auth');
