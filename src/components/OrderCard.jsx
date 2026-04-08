@@ -1,4 +1,5 @@
 import React from 'react';
+import { getCategoryImage } from '../assets/categoryImages';
 
 /**
  * OrderCard — Displays order summary
@@ -43,9 +44,10 @@ const OrderCard = ({ order }) => {
                 {order.items?.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3">
                         <img
-                            src={item.imageUrl || 'https://via.placeholder.com/48'}
+                            src={item.imageUrl || getCategoryImage(item.category)}
                             alt={item.title}
                             className="w-12 h-12 rounded-lg object-cover bg-gray-100"
+                            onError={(e) => { e.target.src = getCategoryImage(item.category); }}
                         />
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-800 truncate">{item.title}</p>

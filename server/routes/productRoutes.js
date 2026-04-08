@@ -5,6 +5,31 @@ const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
 
+// Category-based default images (server-side fallback)
+const CATEGORY_IMAGES = {
+    'Food & Spices': 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600&h=400&fit=crop',
+    'Fruits & Vegetables': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&h=400&fit=crop',
+    'Clothing': 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&h=400&fit=crop',
+    'Home & Garden': 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=600&h=400&fit=crop',
+    'Jewellery': 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=400&fit=crop',
+    'Handicrafts': 'https://images.unsplash.com/photo-1509660933844-6910e12765a0?w=600&h=400&fit=crop',
+    'Beauty & Wellness': 'https://images.unsplash.com/photo-1556760544-74068565f05c?w=600&h=400&fit=crop',
+    'Electronics': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop',
+    'Raw Materials': 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop',
+    'Dairy & Eggs': 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&h=400&fit=crop',
+    'Grains & Pulses': 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?w=600&h=400&fit=crop',
+};
+
+/** Returns image URL for a category, or a generic market image */
+const getCategoryImage = (category) => {
+    if (!category) return 'https://images.unsplash.com/photo-1486401899868-0e435ed85128?w=600&h=400&fit=crop';
+    if (CATEGORY_IMAGES[category]) return CATEGORY_IMAGES[category];
+    const key = Object.keys(CATEGORY_IMAGES).find(
+        (k) => k.toLowerCase().includes(category.toLowerCase()) || category.toLowerCase().includes(k.toLowerCase())
+    );
+    return key ? CATEGORY_IMAGES[key] : 'https://images.unsplash.com/photo-1486401899868-0e435ed85128?w=600&h=400&fit=crop';
+};
+
 // @route   GET /api/products
 // @desc    Get all products with filtering, sorting, pagination
 // @access  Public
@@ -108,9 +133,8 @@ router.get('/:id', async (req, res) => {
 router.post('/', protect, [
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),
-    body('price').isNumeric().withMessage('Price must be a number'),
+    body('price').isNumeric().withMessage('Price must be a number').custom((v) => v > 0).withMessage('Price must be greater than 0'),
     body('category').notEmpty().withMessage('Category is required'),
-    body('imageUrl').notEmpty().withMessage('Image URL is required'),
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -120,8 +144,16 @@ router.post('/', protect, [
     try {
         // Whitelist allowed fields — prevent mass assignment attacks
         const { title, description, price, category, imageUrl, images, stock, tags } = req.body;
+
+        // Auto-assign category default image if seller didn't provide one
+        const finalImageUrl = imageUrl && imageUrl.trim() !== ''
+            ? imageUrl.trim()
+            : getCategoryImage(category);
+
         const product = await Product.create({
-            title, description, price, category, imageUrl, images, stock, tags,
+            title, description, price, category,
+            imageUrl: finalImageUrl,
+            images, stock, tags,
             seller: req.user._id,
         });
 

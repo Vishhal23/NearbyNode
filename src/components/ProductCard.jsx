@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import TrustBadge from './TrustBadge';
 import StarRating from './StarRating';
 import { useCart } from '../context/CartContext';
+import { getCategoryImage } from '../assets/categoryImages';
 
 /**
  * ProductCard — displays a product in the buyer grid
@@ -13,7 +14,9 @@ const ProductCard = ({ product }) => {
     const id = product._id || product.id;
     const name = product.title || product.name || 'Unnamed Product';
     const price = product.price || 0;
-    const image = (product.imageUrls && product.imageUrls.length > 0) ? product.imageUrls[0] : (product.imageUrl || product.image || 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop');
+    const image = (product.imageUrls && product.imageUrls.length > 0)
+        ? product.imageUrls[0]
+        : (product.imageUrl || product.image || getCategoryImage(product.category));
     const category = product.category || 'Uncategorized';
 
     // Seller can be populated object or string/ID
@@ -53,7 +56,7 @@ const ProductCard = ({ product }) => {
                         alt={name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
                         onError={(e) => {
-                            e.target.src = 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop';
+                            e.target.src = getCategoryImage(category);
                         }}
                     />
                     {/* Trust badge overlay */}

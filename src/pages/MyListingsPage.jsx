@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import productService from '../services/productService';
+import { getCategoryImage } from '../assets/categoryImages';
 
 const MyListingsPage = () => {
     const { user, dbUser } = useAuth();
@@ -116,10 +117,11 @@ const MyListingsPage = () => {
                                         >
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-3">
-                                                    <img
-                                                        src={product.imageUrl || product.image || 'https://via.placeholder.com/150'}
+                                                     <img
+                                                        src={product.imageUrl || product.image || getCategoryImage(product.category)}
                                                         alt={product.title}
                                                         className="w-12 h-12 rounded-lg object-cover bg-gray-100"
+                                                        onError={(e) => { e.target.src = getCategoryImage(product.category); }}
                                                     />
                                                     <div className="min-w-0">
                                                         <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{product.title || product.name}</p>

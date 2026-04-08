@@ -6,6 +6,7 @@ import CredibilityMeter from '../components/CredibilityMeter';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import productService from '../services/productService';
+import { getCategoryImage } from '../assets/categoryImages';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -91,7 +92,7 @@ const ProductDetailPage = () => {
                                 alt={product.title || product.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                    e.target.src = 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&h=600&fit=crop';
+                                    e.target.src = getCategoryImage(product.category);
                                 }}
                             />
                             {seller?.isVerified && (

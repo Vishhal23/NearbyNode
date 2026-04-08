@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { useCart } from '../context/CartContext';
+import { getCategoryImage } from '../assets/categoryImages';
 
 const CartPage = () => {
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ const CartPage = () => {
                                     alt={item.name}
                                     className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover bg-gray-100 flex-shrink-0"
                                     onError={(e) => {
-                                        e.target.src = 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=100&h=100&fit=crop';
+                                        e.target.src = getCategoryImage(item.category);
                                     }}
                                 />
                                 <div className="flex-1 min-w-0">

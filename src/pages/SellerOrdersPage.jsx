@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import api from '../services/api';
+import { getCategoryImage } from '../assets/categoryImages';
 
 const statusColors = {
     pending: 'bg-yellow-100 text-yellow-700',
@@ -151,10 +152,10 @@ const SellerOrdersPage = () => {
                                 {order.items?.map((item, idx) => (
                                     <div key={idx} className="flex items-center gap-3">
                                         <img
-                                            src={item.imageUrl || 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=80&h=80&fit=crop'}
+                                            src={item.imageUrl || getCategoryImage(item.category)}
                                             alt={item.title}
                                             className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
-                                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=80&h=80&fit=crop'; }}
+                                            onError={(e) => { e.target.src = getCategoryImage(item.category); }}
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-gray-800 truncate">{item.title}</p>
