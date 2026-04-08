@@ -65,18 +65,18 @@ const Footer = () => {
                         <ul className="space-y-2 text-sm text-gray-400">
                             <li>
                                 <span className="flex items-center gap-2">
-                                    <span className="text-green-400">📍</span> New Delhi, India
+                                    <span className="text-green-400">📍</span> Hyderabad, India
                                 </span>
                             </li>
                             <li>
-                                <span className="flex items-center gap-2">
-                                    <span className="text-green-400">📞</span> +91 98765 43210
-                                </span>
+                                <a href="tel:9553706650" className="flex items-center gap-2 hover:text-green-400 transition-colors">
+                                    <span className="text-green-400">📞</span> +91 9553706650
+                                </a>
                             </li>
                             <li>
-                                <span className="flex items-center gap-2">
-                                    <span className="text-green-400">✉️</span> help@nearbynode.in
-                                </span>
+                                <a href="mailto:vishalgudla2@gmail.com" className="flex items-center gap-2 hover:text-green-400 transition-colors break-all">
+                                    <span className="text-green-400">✉️</span> vishalgudla2@gmail.com
+                                </a>
                             </li>
                         </ul>
                         <div className="mt-4 p-3 bg-green-900/40 border border-green-800/50 rounded-xl">

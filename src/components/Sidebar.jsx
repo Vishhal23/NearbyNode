@@ -1,14 +1,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const navItems = [
+const allNavItems = [
     { to: '/seller/dashboard', icon: '📊', label: 'Dashboard' },
     { to: '/seller/add-product', icon: '➕', label: 'Add Product' },
     { to: '/seller/listings', icon: '📦', label: 'My Listings' },
     { to: '/orders', icon: '📋', label: 'Orders' },
     { to: '/seller/profile', icon: '👤', label: 'My Profile' },
     { to: '/buyer/home', icon: '🛍️', label: 'Browse Market' },
-    { to: '/admin/verify', icon: '🛡️', label: 'Admin Panel' },
+    { to: '/admin/verify', icon: '🛡️', label: 'Admin Panel', adminOnly: true },
 ];
 
 /**
@@ -17,6 +18,8 @@ const navItems = [
  */
 const Sidebar = ({ collapsed = false }) => {
     const location = useLocation();
+    const { dbUser } = useAuth();
+    const navItems = allNavItems.filter(item => !item.adminOnly || dbUser?.role === 'admin');
 
     return (
         <aside className={`${collapsed ? 'w-16' : 'w-64'} bg-gray-900 min-h-screen flex flex-col transition-all duration-300 flex-shrink-0`}>
